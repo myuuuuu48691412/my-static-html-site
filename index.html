@@ -2,11 +2,28 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>My Static HTML Site</title>
+  <title>My Static HTML Site - 機能追加版</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Azure Static Web Apps Demo</h1>
   <p>GitHub Actions からデプロイしています。中村</p>
+
+  <div style="margin-top: 20px; padding: 15px; border: 1px solid #0078d4; background: #fff; border-radius: 4px;">
+    <h3 style="color:#0078d4; margin-top:0;">【追加機能】動的コンテンツ</h3>
+    <p id="time-display" style="margin-bottom: 10px;">読み込み中...</p>
+    <button onclick="greet()" style="padding: 6px 12px; cursor: pointer;">クリックして挨拶を表示</button>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time-display').innerText = 'アクセス日時: ' + now.toLocaleString();
+    }
+    function greet() {
+      alert('課題提出用の動作確認ボタンです。CI/CD経由で正常に反映されました！');
+    }
+    updateTime();
+  </script>
 </body>
 </html>
