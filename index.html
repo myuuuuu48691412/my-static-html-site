@@ -2,28 +2,87 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>My Static HTML Site - 機能追加版</title>
+  <title>Azure Static Web Apps - 遊べる特設ページ</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .game-box {
+      margin-top: 30px;
+      padding: 20px;
+      border: 2px solid #0078d4;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover { background-color: #005a9e; }
+    input { padding: 6px; width: 60px; text-align: center; font-size: 14px; }
+    .result { font-weight: bold; color: #d13438; margin-top: 10px; }
+  </style>
 </head>
 <body>
   <h1>Azure Static Web Apps Demo</h1>
-  <p>GitHub Actions からデプロイしています。中村</p>
+  <p>GitHub Actions からデプロイしています。 担当：松山</p>
 
-  <div style="margin-top: 20px; padding: 15px; border: 1px solid #0078d4; background: #fff; border-radius: 4px;">
-    <h3 style="color:#0078d4; margin-top:0;">【追加機能】動的コンテンツ</h3>
-    <p id="time-display" style="margin-bottom: 10px;">読み込み中...</p>
-    <button onclick="greet()" style="padding: 6px 12px; cursor: pointer;">クリックして挨拶を表示</button>
+  <div class="game-box">
+    <h3>機能その1：1〜10の数当てゲーム</h3>
+    <p>1から10の中で、コンピューターがハズレ（爆弾）を1つ隠しました。セーフな数字を当ててください！</p>
+    <input type="number" id="guess-input" min="1" max="10" placeholder="5">
+    <button onclick="playGame()">数字を選択</button>
+    <div id="game-result" class="result"></div>
+  </div>
+
+  <div class="game-box">
+    <h3>機能その2：本日のAzure開発運勢占い</h3>
+    <p>今日のあなたのデプロイ運勢を占います。</p>
+    <button onclick="drawOmikuji()">おみくじを引く</button>
+    <div id="omikuji-result" class="result" style="color: #107c41; font-size: 18px;"></div>
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      document.getElementById('time-display').innerText = 'アクセス日時: ' + now.toLocaleString();
+    // 数当てゲームの初期化（爆弾の数字をランダムで1つ決定）
+    let bombNumber = Math.floor(Math.random() * 10) + 1;
+
+    function playGame() {
+      const input = document.getElementById('guess-input').value;
+      const resultDiv = document.getElementById('game-result');
+      const guess = parseInt(input);
+
+      if (isNaN(guess) || guess < 1 || guess > 10) {
+        resultDiv.innerText = '1から10の数字を入力してください！';
+        return;
+      }
+
+      if (guess === bombNumber) {
+        resultDiv.innerHTML = '💥 ドカーン！爆弾を引いてしまいました！(ハズレ)';
+        resultDiv.style.color = '#d13438';
+        // 爆弾の位置をリセット
+        bombNumber = Math.floor(Math.random() * 10) + 1;
+      } else {
+        resultDiv.innerHTML = '🟢 セーフ！お見事です！';
+        resultDiv.style.color = '#107c41';
+      }
     }
-    function greet() {
-      alert('課題提出用の動作確認ボタンです。CI/CD経由で正常に反映されました！');
+
+    // おみくじ機能
+    function drawOmikuji() {
+      const fortunes = [
+        '🌟 大吉：すべてのプッシュが一発で✅になります！ラッキーアイテム：認証トークン',
+        '🙂 吉：エラーが出ても原因がすぐに見つかるでしょう。',
+        '🔺 凶：git pull を忘れて競合（Conflict）が起きる予感。落ち着いて対処しましょう。',
+        '💀 大凶：deployment_token missing が再発するかもしれません！シークレットを確認せよ！'
+      ];
+      const random = Math.floor(Math.random() * fortunes.length);
+      document.getElementById('omikuji-result').innerText = fortunes[random];
     }
-    updateTime();
   </script>
 </body>
 </html>
