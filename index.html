@@ -2,86 +2,123 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Azure Static Web Apps - 遊べる特設ページ</title>
+  <title>夏休み！屋台の出し物ルーレット</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .game-box {
-      margin-top: 30px;
+    body {
+      background-color: #fff5e6; /* 屋台らしい温かみのある背景色 */
+      text-align: center;
+      padding-top: 50px;
+    }
+    .container {
+      background-color: white;
+      border: 4px solid #cc3300; /* お祭りカラーの赤 */
+      border-radius: 12px;
+      padding: 30px;
+      display: inline-block;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      max-width: 450px;
+      width: 90%;
+    }
+    h1 {
+      color: #cc3300;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .roulette-display {
+      font-size: 36px;
+      font-weight: bold;
+      color: #333;
+      background: #f0f0f0;
       padding: 20px;
-      border: 2px solid #0078d4;
-      background: #ffffff;
+      margin: 20px 0;
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border: 2px dashed #666;
+      min-height: 54px;
     }
     button {
-      padding: 8px 16px;
-      background-color: #0078d4;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px 24px;
+      background-color: #ff9900; /* お祭りカラーのオレンジ */
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 25px;
       cursor: pointer;
-      font-size: 14px;
-      margin: 5px;
+      box-shadow: 0 4px #cc7a00;
+      transition: all 0.1s;
     }
-    button:hover { background-color: #005a9e; }
-    input { padding: 6px; width: 60px; text-align: center; font-size: 14px; }
-    .result { font-weight: bold; color: #d13438; margin-top: 10px; }
+    button:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+    button:disabled {
+      background-color: #ccc;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .result-msg {
+      font-size: 20px;
+      font-weight: bold;
+      color: #cc3300;
+      margin-top: 20px;
+      min-height: 30px;
+    }
   </style>
 </head>
 <body>
-  <h1>Azure Static Web Apps Demo</h1>
-  <p>GitHub Actions からデプロイしています。 担当：松山</p>
 
-  <div class="game-box">
-    <h3>機能その1：1〜10の数当てゲーム</h3>
-    <p>1から10の中で、コンピューターがハズレ（爆弾）を1つ隠しました。セーフな数字を当ててください！</p>
-    <input type="number" id="guess-input" min="1" max="10" placeholder="5">
-    <button onclick="playGame()">数字を選択</button>
-    <div id="game-result" class="result"></div>
-  </div>
-
-  <div class="game-box">
-    <h3>機能その2：本日のAzure開発運勢占い</h3>
-    <p>今日のあなたのデプロイ運勢を占います。</p>
-    <button onclick="drawOmikuji()">おみくじを引く</button>
-    <div id="omikuji-result" class="result" style="color: #107c41; font-size: 18px;"></div>
+  <div class="container">
+    <h1>🏮 夏休み！屋台ルーレット 🏮</h1>
+    <p>お祭りで最初に食べる屋台の出し物を決めよう！</p>
+    
+    <div class="roulette-display" id="display">❓ ❓ ❓</div>
+    
+    <button id="spin-btn" onclick="startRoulette()">ルーレットを回す！</button>
+    
+    <div class="result-msg" id="result"></div>
   </div>
 
   <script>
-    // 数当てゲームの初期化（爆弾の数字をランダムで1つ決定）
-    let bombNumber = Math.floor(Math.random() * 10) + 1;
+    // ルーレットの中身（夏休みの屋台の出し物）
+    const items = [
+      '🍧 かき氷', 
+      '🐙 たこ焼き', 
+      '🏮 焼きそば', 
+      '🍎 りんご飴', 
+      '🍫 チョコバナナ', 
+      '🌭 フランクフルト', 
+      '🦑 イカ焼き', 
+      '🎯 射的ゲーム'
+    ];
+    let timer = null;
 
-    function playGame() {
-      const input = document.getElementById('guess-input').value;
-      const resultDiv = document.getElementById('game-result');
-      const guess = parseInt(input);
+    function startRoulette() {
+      const btn = document.getElementById('spin-btn');
+      const display = document.getElementById('display');
+      const result = document.getElementById('result');
+      
+      btn.disabled = true; // 連打防止
+      result.innerText = '';
+      let count = 0;
 
-      if (isNaN(guess) || guess < 1 || guess > 10) {
-        resultDiv.innerText = '1から10の数字を入力してください！';
-        return;
-      }
+      // 0.1秒ごとにランダムで出し物を切り替える（回転演出）
+      timer = setInterval(() => {
+        const randomItem = items[Math.floor(Math.random() * items.length)];
+        display.innerText = randomItem;
+        count++;
 
-      if (guess === bombNumber) {
-        resultDiv.innerHTML = '💥 ドカーン！爆弾を引いてしまいました！(ハズレ)';
-        resultDiv.style.color = '#d13438';
-        // 爆弾の位置をリセット
-        bombNumber = Math.floor(Math.random() * 10) + 1;
-      } else {
-        resultDiv.innerHTML = '🟢 セーフ！お見事です！';
-        resultDiv.style.color = '#107c41';
-      }
-    }
-
-    // おみくじ機能
-    function drawOmikuji() {
-      const fortunes = [
-        '🌟 大吉：すべてのプッシュが一発で✅になります！ラッキーアイテム：認証トークン',
-        '🙂 吉：エラーが出ても原因がすぐに見つかるでしょう。',
-        '🔺 凶：git pull を忘れて競合（Conflict）が起きる予感。落ち着いて対処しましょう。',
-        '💀 大凶：deployment_token missing が再発するかもしれません！シークレットを確認せよ！'
-      ];
-      const random = Math.floor(Math.random() * fortunes.length);
-      document.getElementById('omikuji-result').innerText = fortunes[random];
+        // 15回切り替わったらストップ
+        if (count > 15) {
+          clearInterval(timer);
+          btn.disabled = false;
+          
+          // 最終決定
+          const finalItem = items[Math.floor(Math.random() * items.length)];
+          display.innerText = finalItem;
+          result.innerText = '🎯 今日のおすすめは「' + finalItem + '」に決定！';
+        }
+      }, 100);
     }
   </script>
 </body>
